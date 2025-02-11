@@ -1,10 +1,27 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { NavLink } from 'react-router-dom'
+import { AppContext } from '../context/AppContext'
 
 const Dashboard = () => {
     const navigate = useNavigate()
+
+    const {companyData, setCompanyData, setCompanyToken} = useContext(AppContext)
+
+    // function to logout for company
+    const logout = () => {
+        setCompanyToken(null)
+        localStorage.removeItem('companyToken')
+        setCompanyData(null)
+        navigate('/')
+    }
+
+    useEffect(() => {
+        if(companyData){
+            navigate('/dashboard/manage-jobs');
+        }
+    },[companyData])
 
     return (
         <div className='min-h-screen flex flex-col'>
@@ -17,22 +34,33 @@ const Dashboard = () => {
                         src={assets.logo} 
                         alt="Company Logo" 
                     />
-                    <div className='flex items-center gap-3'>
-                        <p className='max-sm:hidden'>Welcome, Recruiter</p>
-                        {/* Profile Dropdown */}
-                        <div className='relative group'>
-                            <img 
-                                className='w-8 rounded-full border border-gray-300 cursor-pointer' 
-                                src={assets.company_icon} 
-                                alt="Profile" 
-                            />
-                            <div className='absolute hidden group-hover:block top-full mt-2 right-0 bg-white shadow-md text-black rounded p-2 w-32'>
-                                <ul className='list-none m-0 p-2 bg-white rounded border-0 text-sm'>
-                                    <li className='py-1 px-2 pr-10 cursor-pointer hover:bg-gray-100'>Logout</li>
-                                </ul>
+
+                    {
+                        companyData && (
+
+                        <div className='flex items-center gap-3'>
+                            <p className='max-sm:hidden'>Welcome, {companyData.name}</p>
+
+                            {/* Profile Dropdown */}
+                            <div className='relative group' tabIndex="0">
+                                <img 
+                                    className='w-8 rounded-full border border-gray-300 cursor-pointer' 
+                                    src={companyData.image} 
+                                    alt="Profile" 
+                                />
+
+                                {/* Dropdown Menu */}
+                                <div className='absolute hidden group-hover:block group-focus-within:block top-full mt-2 right-0 z-10 bg-white shadow-md text-black rounded p-2 w-32'>
+                                    <ul className='list-none m-0 p-2 bg-white rounded border-0 text-sm'>
+                                        <li onClick={logout} className='py-1 px-2 pr-10 cursor-pointer hover:bg-gray-100'>Logout</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
+                        )
+                    }
+
                 </div>
             </div>
 
