@@ -102,7 +102,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Main Content Area */}
-                <div className='flex-1 p-6'>
+                <div className='flex-1 h-full p-2 sm:p-5'>
                     <Outlet />
                 </div>
             </div>

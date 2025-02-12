@@ -271,6 +271,11 @@ export const jobsData = [
         <ol>
             <li>Automate deployment processes using CI/CD tools to streamline development workflows.</li>
             <li>Manage cloud infrastructure, ensuring optimal performance and scalability.</li>
+          <p>Enhance our deployment pipeline as a DevOps Engineer. This role will involve automating deployment processes, managing cloud infrastructure, and implementing best practices for security and performance. You will play a vital role in bridging the gap between development and operations, ensuring efficient workflows and high-quality releases.</p>
+        <h2><strong>Key Responsibilities</strong></h2>
+        <ol>
+            <li>Automate deployment processes using CI/CD tools to streamline development workflows.</li>
+            <li>Manage cloud infrastructure, ensuring optimal performance and scalability.</li>
             <li>Implement security best practices to safeguard our systems.</li>
             <li>Monitor application performance and troubleshoot issues proactively.</li>
             <li>Collaborate with developers to improve system reliability and efficiency.</li>
