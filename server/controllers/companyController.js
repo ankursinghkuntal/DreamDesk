@@ -98,19 +98,22 @@ export const loginCompany = async (req, res) => {
 // Get company data
 export const getCompanyData = async (req, res) => {
     console.log("getCompanyData");
+
     try {
-        
-        const company = req.company;
-        res.json({success: true, company})
+        if (!req.company) {
+            return res.status(404).json({ success: false, message: "Company not found" });
+        }
+
+        res.json({ success: true, company: req.company });
 
     } catch (error) {
-        res.json({
-            success: false, 
-            message: error.message
+        res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
         });
     }
+};
 
-}
 
 // Post a new job
 export const postJob = async (req, res) => {

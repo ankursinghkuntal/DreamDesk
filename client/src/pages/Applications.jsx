@@ -53,8 +53,11 @@ const Applications = () => {
     if(user){
       fetchUserApplications()
     }
-
   }, [user])
+
+  useEffect(() => {
+    console.log("User Applications:", userApplications);
+  }, [userApplications]);
 
   return (
     <>
@@ -68,7 +71,7 @@ const Applications = () => {
                 <p className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg mr-2">{resume ? resume.name : "Select Resume"}</p>
                 <input
                   id="resumeUpload"
-                  onChange={(e) => setResume(e.target.files[0])}
+                  onChange={e => setResume(e.target.files[0])}
                   accept="application/pdf"
                   type="file"
                   hidden
@@ -84,11 +87,17 @@ const Applications = () => {
             </>
           ) : (
             <div className="flex gap-2">
-              {resume && (
-                <a target='_blank' href={userData.resume} className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg" rel="noopener noreferrer">
-                  View Resume
-                </a>
-              )}
+            {userData?.resume && (
+              <a 
+                target='_blank' 
+                href={userData.resume} 
+                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg" 
+                rel="noopener noreferrer"
+              >
+                View Resume
+              </a>
+            )}
+
               <button onClick={() => setIsEdit(true)} className="text-gray-500 border border-gray-300 rounded-lg px-4 py-2">
                 Edit
               </button>
@@ -108,14 +117,14 @@ const Applications = () => {
             </tr>
           </thead>
           <tbody>
-            {userApplications.map((job, index) => (
+          {userApplications.map((job, index) => (
               <tr key={index}>
                 <td className="py-3 px-4 flex items-center gap-2 border-b">
-                  <img className="w-8 h-8" src={job.companyId.image} alt={job.company} />
-                  {job.companyId.name}
+                  <img className="w-8 h-8" src={job.companyId?.image} alt={job.companyId?.name || 'Company'} />
+                  {job.companyId?.name}
                 </td>
-                <td className="py-2 px-4 border-b">{job.jobId.title}</td>
-                <td className="py-2 px-4 border-b max-md:hidden">{job.jobId.location}</td>
+                <td className="py-2 px-4 border-b">{job.jobId?.title}</td>
+                <td className="py-2 px-4 border-b max-md:hidden">{job.jobId?.location}</td>
                 <td className="py-2 px-4 border-b max-md:hidden">{moment(job.date).format('ll')}</td>
                 <td className="py-2 px-4 border-b">
                   <span className={`${job.status === 'Accepted' ? 'bg-green-100' : job.status === 'Rejected' ? 'bg-red-100' : 'bg-blue-100'} px-4 py-1.5 rounded`}>
@@ -125,6 +134,7 @@ const Applications = () => {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
       <Footer />

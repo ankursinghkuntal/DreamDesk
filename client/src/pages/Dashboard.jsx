@@ -29,7 +29,7 @@ const Dashboard = () => {
             <div className='shadow py-4 bg-white'>
                 <div className='px-5 flex justify-between items-center'>
                     <img 
-                        onClick={() => navigate('/')} 
+                        onClick={e => navigate('/')} 
                         className='max-sm:w-32 cursor-pointer' 
                         src={assets.logo} 
                         alt="Company Logo" 

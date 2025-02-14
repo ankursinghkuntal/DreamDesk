@@ -8,7 +8,7 @@ import { AppContext } from './context/AppContext'
 import Dashboard from './pages/Dashboard'
 import AddJob from './pages/AddJob'
 import Managejobs from './pages/Managejobs'
-import Viewapplicatins from './pages/Viewapplicatins'
+import ViewApplicatins from './pages/Viewapplicatins'
 import 'quill/dist/quill.snow.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -32,7 +32,7 @@ const App = () => {
                 companyToken ? <>
                   <Route path='add-job' element={<AddJob/>}/>
                   <Route path='manage-jobs' element={<Managejobs/>}/>
-                  <Route path='view-applications' element={<Viewapplicatins/>}/>
+                  <Route path='view-applications' element={<ViewApplicatins/>}/>
                 </>
                 :
                 null

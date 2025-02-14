@@ -10,7 +10,8 @@ export const getUserData = async (req, res) => {
 
     try {
         // ✅ Extract authentication data
-        const { userId } = getAuth(req);
+        // const { userId } = getAuth(req);
+        const userId = req.auth.userId;
 
         if (!userId) {
             console.log("❌ Unauthorized access attempt.");
@@ -35,48 +36,62 @@ export const getUserData = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
 // apply for a job
 export const applyForJob = async (req, res) => {
-
     console.log("applyForJob");
 
-    const {jobId} = req.body;
-    const userId = req.auth.userId;
-
     try {
+        // 🛠 Validate Authentication
+        if (!req.auth || !req.auth.userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized: User not authenticated",
+            });
+        }
+
+        const { jobId } = req.body;
+        const userId = req.auth.userId;
+
+        console.log(jobId);
+        console.log(userId);
         
-        const isAlreadyApplied = await JobApplication.findOne({ jobId,userId });
+        
 
-        if(isAlreadyApplied.length > 0){
+        // 🛠 Check If User Already Applied
+        const isAlreadyApplied = await JobApplication.findOne({ jobId, userId });
+
+        if (isAlreadyApplied) { // ✅ Fix: No `.length` needed         // he uses       isAlreadyApplied.length > 0
             return res.json({
                 success: false,
-                message: "Already applied for this job"
-            })
+                message: "Already applied for this job",
+            });
         }
+        
 
+        // 🛠 Check If Job Exists
         const jobData = await Job.findById(jobId);
-
-        if(!jobData){
-            return res.json({
+        if (!jobData) {
+            return res.status(404).json({
                 success: false,
-                message: "Job not found"
-            })
+                message: "Job not found",
+            });
         }
 
-        await JobApplication.create({ 
+        // ✅ Apply for Job
+        await JobApplication.create({
             companyId: jobData.companyId,
-            userId, 
+            userId,
             jobId,
-            date : Date.now() 
+            date: Date.now(), // Store timestamp properly
         });
 
-        res.json({success: true, message: "Applied for job"})
-
+        res.json({ success: true, message: "Applied for job" });
     } catch (error) {
-        res.json({success: false, message: error.message})
+        console.error("❌ Apply Job Error:", error);
+        res.status(500).json({ success: false, message: error.message });
     }
-
-}
+};
 
 // get user applied applications
 export const getUserJobApplications = async (req, res) => {
@@ -86,10 +101,12 @@ export const getUserJobApplications = async (req, res) => {
     try {
         
         const userId = req.auth.userId;
+        // const { userId } = getAuth(req);
+        console.log(userId);
 
         const applications = await JobApplication.find({userId})
         .populate('companyId', 'name email image')
-        .populate('jobId', 'title description location salary level category')
+        .populate('jobId', 'title description location category level salary')
         .exec();
 
         if (!applications) {

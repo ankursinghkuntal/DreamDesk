@@ -15,78 +15,84 @@ import { useAuth } from '@clerk/clerk-react'
 
 const ApplyJob = () => {
 
-  const  { id } = useParams()
-
-  const {getToken} = useAuth()
-
-  const navigate = useNavigate()
-
-  const [JobData, setJobData] = useState(null)
-  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false)
-
-  const {jobs, backendUrl, userData, userApplications, fetchUserApplications} = useContext(AppContext)
-
+  const { id } = useParams();
+  const { getToken } = useAuth();
+  const navigate = useNavigate();
+  
+  const [JobData, setJobData] = useState(null);
+  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+  
+  const { jobs, backendUrl, userData, userApplications, fetchUserApplications } = useContext(AppContext);
+  
   const fetchJob = async () => {
-
-      try {
-            const {data} = await axios.get(backendUrl + `/api/jobs/${id}`)
-            if(data.success){
-              setJobData(data.job)
-            }else{
-              toast.error(data.message)
-            }      
-      } catch (error) {
-            toast.error(error.message)
-      }
-
-  }
-
-  const applyHandler = async () =>{
+    if (!id) return;
     try {
-
-        if(!userData){
-          return toast.error('Please login to apply for jobs')
-        }
-
-        if (!userData.resume) {
-          navigate('/applications')
-          return toast.error('Please upload your resume to apply for jobs')
-        }
-
-        const token = await getToken()
-
-        const {data} = await axios.post(backendUrl + '/api/users/apply',
-          {jobId: JobData._id},
-          {headers: {Authorization: `Bearer ${token}`}}
-        )
-
-        if(data.success){
-          toast.success(data.message);
-          fetchUserApplications()
-        }else{
-          toast.error(data.message);
-        }
-
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
-
-  const checkAlreadyApplied = () => {
-    const hasApplied = userApplications.some(item => item.jobId._id === JobData._id)
-    setIsAlreadyApplied(hasApplied)
-
-  }
-
-  useEffect(()=>{
-    fetchJob()
-  },[id])
-
-  useEffect(() => {
-      if(userApplications.length > 0 && JobData){
-        checkAlreadyApplied()
+      const { data } = await axios.get(`${backendUrl}/api/jobs/${id}`);
+      if (data.success) {
+        setJobData(data.job);
+      } else {
+        toast.error(data.message);
       }
-      }, [JobData, userApplications, id])
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  
+  const applyHandler = async () => {
+    try {
+      if (!userData) {
+        return toast.error('Please login to apply for jobs');
+      }
+  
+      if (!userData.resume) {
+        navigate('/applications');
+        return toast.error('Please upload your resume to apply for jobs');
+      }
+  
+      if (!JobData?._id) {
+        return toast.error('Invalid job data. Please try again later.');
+      }
+  
+      if (isAlreadyApplied) {
+        return toast.error("You have already applied for this job.");
+      }
+  
+      const token = await getToken();
+  
+      const { data } = await axios.post(`${backendUrl}/api/users/apply`,
+        { jobId: JobData._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      if (data.success) {
+        toast.success(data.message);
+        await fetchUserApplications();  // ✅ Ensure UI updates after refreshing applications
+      } else {
+        toast.error(data.message);
+      }
+  
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+  
+  const checkAlreadyApplied = () => {
+    if (!JobData || !userApplications) return;
+    const hasApplied = userApplications.some(item => item.jobId?._id === JobData?._id);
+    setIsAlreadyApplied(hasApplied);
+  };
+  
+  useEffect(() => {
+    fetchJob();
+  }, [id]);
+  
+  useEffect(() => {
+    if (userApplications.length > 0 && JobData) {
+      checkAlreadyApplied();
+    }
+  }, [JobData, userApplications, id]);
+  
 
   return JobData ? (
     <div>
